@@ -35,7 +35,7 @@ namespace JsonReader
 			// 
 			// ReadJson
 			// 
-			this.ReadJson.Location = new System.Drawing.Point(272, 31);
+			this.ReadJson.Location = new System.Drawing.Point(352, 34);
 			this.ReadJson.Name = "ReadJson";
 			this.ReadJson.Size = new System.Drawing.Size(75, 23);
 			this.ReadJson.TabIndex = 0;

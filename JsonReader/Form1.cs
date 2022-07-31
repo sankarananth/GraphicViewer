@@ -19,6 +19,7 @@ namespace JsonReader
 		{
 			InitializeComponent();
 			CenterToScreen();
+			BackColor = Color.DarkBlue;
 		}
 
 		private void ReadJson_Click(object sender, EventArgs e)
@@ -74,19 +75,33 @@ namespace JsonReader
 			{
 				case ShapesEnum.Line:
 					Line line = JsonConvert.DeserializeObject<Line>(JsonConvert.SerializeObject(shape));
+					var colorLine = GetColor(line.Color.Split(';'));
+					Pen pen = new Pen(colorLine);
+					pen.Width = 2;
+					System.Drawing.Graphics lineGraphics;
+					lineGraphics = this.CreateGraphics();
+					line.PointA = line.PointA.Replace(',', '.');
+					line.PointB = line.PointB.Replace(',', '.');
+					var pointA=line.PointA.Split(';');
+					var pointB = line.PointB.Split(';');
+					Point topLeft = new Point()
+					{
+						X = (this.ClientRectangle.Width) / 2,
+						Y = (this.ClientRectangle.Height) / 2
+					};
+					lineGraphics.DrawLine(pen, topLeft.X-Convert.ToInt32(float.Parse(pointA[0])), topLeft.Y - Convert.ToInt32(float.Parse(pointA[1])), topLeft.X - Convert.ToInt32(float.Parse(pointB[0])), topLeft.Y - Convert.ToInt32(float.Parse(pointB[1])));
 					break;
 				case ShapesEnum.Circle:
 					Circle circle = JsonConvert.DeserializeObject<Circle>(JsonConvert.SerializeObject(shape));
-					string[] coloursArray = circle.Color.Split(';');
-					var color = GetColor(coloursArray);
-					System.Drawing.Pen myPen = new System.Drawing.Pen(color);
+					var colorCircle = GetColor(circle.Color.Split(';'));
+					System.Drawing.Pen myPen = new System.Drawing.Pen(colorCircle);
 					System.Drawing.Graphics formGraphics;
 					formGraphics = this.CreateGraphics();
 					var centerPoints = circle.Center.Split(';');
 					DrawCircle(formGraphics, myPen, float.Parse(centerPoints[0]), float.Parse(centerPoints[1]), float.Parse(circle.Radius.ToString()));
 					if(circle.Filled)
 					{
-						Brush brush = new SolidBrush(color);
+						Brush brush = new SolidBrush(colorCircle);
 						FillCircle(formGraphics, brush, float.Parse(centerPoints[0]), float.Parse(centerPoints[1]), float.Parse(circle.Radius.ToString()));
 					}
 						
@@ -94,7 +109,42 @@ namespace JsonReader
 					formGraphics.Dispose();
 					break;
 				case ShapesEnum.Triangle:
+					System.Drawing.Graphics triangleGraphics;
+					triangleGraphics = this.CreateGraphics();
 					Triangle triangle = JsonConvert.DeserializeObject<Triangle>(JsonConvert.SerializeObject(shape));
+					triangle.PointA = triangle.PointA.Replace(',', '.');
+					triangle.PointB = triangle.PointB.Replace(',', '.');
+					triangle.PointC = triangle.PointC.Replace(',', '.');
+					var tpointA = triangle.PointA.Split(';');
+					var tpointB = triangle.PointB.Split(';');
+					var tpointC = triangle.PointC.Split(';');
+					Color triangleColor = GetColor(triangle.Color.Split(';'));
+					 myPen = new System.Drawing.Pen(triangleColor);
+					Brush triangleBrush = new SolidBrush(triangleColor);
+					Point firstPoint = new Point
+					{
+						X=Convert.ToInt32(float.Parse(tpointA[0])),
+						Y= Convert.ToInt32(float.Parse(tpointA[1]))
+					};
+					Point secondPoint = new Point
+					{
+						X = Convert.ToInt32(float.Parse(tpointB[0])),
+						Y = Convert.ToInt32(float.Parse(tpointB[1]))
+					};
+					Point thirdPoint = new Point
+					{
+						X = Convert.ToInt32(float.Parse(tpointC[0])),
+						Y = Convert.ToInt32(float.Parse(tpointC[1]))
+					};
+					Point topLeftTraingle = new Point()
+					{
+						X = (this.ClientRectangle.Width - 100) / 2,
+						Y = (this.ClientRectangle.Height - 100) / 2
+					};
+					if (triangle.Filled)
+						triangleGraphics.FillPolygon(triangleBrush, new Point[] { new Point(topLeftTraingle.X - firstPoint.X, topLeftTraingle.Y - firstPoint.Y), new Point(topLeftTraingle.X - secondPoint.X, topLeftTraingle.Y - secondPoint.Y), new Point(topLeftTraingle.X - thirdPoint.X, topLeftTraingle.Y - thirdPoint.Y) });
+					else
+						triangleGraphics.DrawPolygon(myPen, new Point[] { new Point(topLeftTraingle.X - firstPoint.X, topLeftTraingle.Y - firstPoint.Y), new Point(topLeftTraingle.X - secondPoint.X, topLeftTraingle.Y - secondPoint.Y), new Point(topLeftTraingle.X - thirdPoint.X, topLeftTraingle.Y - thirdPoint.Y) });
 					break;
 			}
 
